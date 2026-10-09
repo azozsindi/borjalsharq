@@ -28,7 +28,7 @@ export const Hero: React.FC = () => {
         
         {/* Hero Content */}
         <div className="max-w-4xl mx-auto flex flex-col items-center text-center space-y-6">
-          
+
           {/* Verified Google Maps Status */}
           <div className="flex flex-wrap items-center justify-center gap-2.5 text-xs sm:text-sm text-slate-300 font-medium">
             <span className="flex items-center gap-1.5 text-amber-300 font-semibold">

@@ -9,7 +9,7 @@ export const Navbar: React.FC = () => {
   const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
   const [logoClicks, setLogoClicks] = useState(0);
 
-  // Enable discreet logo manager access for owner (e.g. ?admin=1 in URL, or Ctrl+Shift+L)
+  // Enable discreet logo manager access for owner (e.g. ?admin=1 in URL, or custom event)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('admin') === '1' || params.get('edit_logo') === '1' || params.get('logo') === '1') {
@@ -23,15 +23,23 @@ export const Navbar: React.FC = () => {
       }
     };
 
+    const handleCustomOpen = () => {
+      setIsLogoModalOpen(true);
+    };
+
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('open-logo-manager', handleCustomOpen);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('open-logo-manager', handleCustomOpen);
+    };
   }, []);
 
-  // Discreet 5-clicks on logo triggers owner manager without showing developer buttons to customers
+  // 3-clicks on logo triggers owner manager
   const handleLogoClick = () => {
     setLogoClicks((prev) => {
       const next = prev + 1;
-      if (next >= 5) {
+      if (next >= 3) {
         setIsLogoModalOpen(true);
         return 0;
       }
@@ -53,7 +61,7 @@ export const Navbar: React.FC = () => {
                 className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c5a059] rounded-lg whitespace-nowrap shrink-0 group transition-transform active:scale-95"
                 aria-label="برج الشارقة لزينة السيارات - الصفحة الرئيسية"
               >
-                <div className="scale-80 sm:scale-90 origin-right transition-transform group-hover:scale-95">
+                <div className="transition-transform group-hover:scale-102 flex items-center">
                   <Logo size="sm" />
                 </div>
               </a>

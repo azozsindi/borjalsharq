@@ -1,9 +1,32 @@
 import { doc, onSnapshot, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 
-export const DEFAULT_LOGO_URL = '/logo.svg';
+export const DEFAULT_LOGO_URL = '/logo.webp';
 const STORAGE_KEY = 'borj_alsharq_custom_logo';
 const SETTINGS_DOC_PATH = 'settings/site';
+
+/**
+ * Update browser tab favicon dynamically
+ */
+export function updateBrowserFavicon(url: string) {
+  if (typeof document === 'undefined') return;
+  try {
+    const existingIcons = document.querySelectorAll("link[rel*='icon']");
+    if (existingIcons.length > 0) {
+      existingIcons.forEach((el) => {
+        (el as HTMLLinkElement).href = url;
+      });
+    } else {
+      const link = document.createElement('link');
+      link.type = 'image/webp';
+      link.rel = 'shortcut icon';
+      link.href = url;
+      document.getElementsByTagName('head')[0].appendChild(link);
+    }
+  } catch (e) {
+    console.warn('Could not update browser tab icon:', e);
+  }
+}
 
 /**
  * Resize and compress an uploaded image file into a clean, lightweight data URL
@@ -57,15 +80,20 @@ export async function processUploadedLogoFile(file: File, maxWidth = 600): Promi
  * Subscribe to the official logo from Firestore with fallback to localStorage & /logo.svg
  */
 export function subscribeToStoreLogo(onLogoChange: (url: string) => void): () => void {
+  const triggerChange = (url: string) => {
+    updateBrowserFavicon(url);
+    onLogoChange(url);
+  };
+
   // 1. Initial cached value
   let currentLogo = DEFAULT_LOGO_URL;
   if (typeof window !== 'undefined') {
     const cached = localStorage.getItem(STORAGE_KEY);
     if (cached) {
       currentLogo = cached;
-      onLogoChange(cached);
+      triggerChange(cached);
     } else {
-      onLogoChange(DEFAULT_LOGO_URL);
+      triggerChange(DEFAULT_LOGO_URL);
     }
   }
 
@@ -86,21 +114,21 @@ export function subscribeToStoreLogo(onLogoChange: (url: string) => void): () =>
                 console.warn('LocalStorage quota exceeded for logo cache:', e);
               }
             }
-            onLogoChange(data.logoUrl);
+            triggerChange(data.logoUrl);
             return;
           }
         }
         // If document doesn't specify logoUrl, check localStorage or default
         if (typeof window !== 'undefined') {
           const cached = localStorage.getItem(STORAGE_KEY);
-          onLogoChange(cached || DEFAULT_LOGO_URL);
+          triggerChange(cached || DEFAULT_LOGO_URL);
         }
       },
       (error) => {
         console.warn('Firestore settings listener error (falling back to local cache):', error);
         if (typeof window !== 'undefined') {
           const cached = localStorage.getItem(STORAGE_KEY);
-          onLogoChange(cached || DEFAULT_LOGO_URL);
+          triggerChange(cached || DEFAULT_LOGO_URL);
         }
       }
     );
@@ -120,6 +148,7 @@ export async function saveLogoPermanently(logoUrl: string): Promise<void> {
   if (typeof window !== 'undefined') {
     try {
       localStorage.setItem(STORAGE_KEY, logoUrl);
+      updateBrowserFavicon(logoUrl);
     } catch (e) {
       console.warn('Could not cache logo in localStorage:', e);
     }

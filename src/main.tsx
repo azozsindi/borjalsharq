@@ -1,11 +1,22 @@
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-import { initAnalytics, testConnection } from './firebase.ts';
+import { testConnection } from './firebase.ts';
 
-// Initialize Firebase Google Analytics (G-L2DG0QBQQ5)
-initAnalytics();
-testConnection();
+// Test connection to Firestore
+testConnection().catch(() => {});
+
+// Prevent benign unhandled errors (e.g. Firebase Analytics installation apiKey mismatch or ResizeObserver)
+window.addEventListener('unhandledrejection', (event) => {
+  const reason = event?.reason?.message || String(event?.reason || '');
+  if (
+    reason.includes('installations/request-failed') ||
+    reason.includes('API key not valid') ||
+    reason.includes('ResizeObserver')
+  ) {
+    event.preventDefault();
+  }
+});
 
 // Prevent ResizeObserver benign loop notification errors from uncaught propagation
 window.addEventListener(

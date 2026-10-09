@@ -127,7 +127,7 @@ export const Footer: React.FC = () => {
         {/* Copyright */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} {STORE_INFO.name} - جدة، المملكة العربية السعودية.</p>
-          <div className="flex items-center gap-4 text-slate-500">
+          <div className="flex items-center gap-3 text-slate-500">
             <span>التسوّق والتركيب داخل المتجر</span>
             <span aria-hidden="true">·</span>
             <span>حي طيبة - جدة</span>

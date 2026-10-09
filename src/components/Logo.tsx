@@ -5,87 +5,89 @@ interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'hero';
   showBackground?: boolean;
   className?: string;
+  onClick?: () => void;
 }
 
 export const Logo: React.FC<LogoProps> = ({
   size = 'md',
   showBackground = false,
-  className = ''
+  className = '',
+  onClick
 }) => {
-  const [customLogoUrl, setCustomLogoUrl] = useState<string>(DEFAULT_LOGO_URL);
+  const [customLogoUrl, setCustomLogoUrl] = useState<string>('/logo.webp');
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     const unsubscribe = subscribeToStoreLogo((url) => {
-      setCustomLogoUrl(url || DEFAULT_LOGO_URL);
-      setImageError(false);
+      if (url) {
+        setCustomLogoUrl(url);
+        setImageError(false);
+      }
     });
     return () => unsubscribe();
   }, []);
 
+  const logoSrc = customLogoUrl || '/logo.webp';
+  const showImage = Boolean(logoSrc && !imageError);
+
   const dimensions = {
     sm: {
-      carWidth: 150,
-      carHeight: 28,
-      mainText: 'text-lg',
-      subText: 'text-xs',
-      container: 'py-2 px-3',
+      carWidth: 140,
+      carHeight: 26,
+      mainText: 'text-base sm:text-lg',
+      subText: 'text-[10px] sm:text-xs',
+      container: 'py-1 px-2',
       imgHeight: 'h-10 sm:h-12'
     },
     md: {
-      carWidth: 210,
-      carHeight: 40,
-      mainText: 'text-2xl',
-      subText: 'text-sm',
-      container: 'py-3 px-4',
+      carWidth: 200,
+      carHeight: 38,
+      mainText: 'text-xl sm:text-2xl',
+      subText: 'text-xs sm:text-sm',
+      container: 'py-2 px-3',
       imgHeight: 'h-14 sm:h-16'
     },
     lg: {
-      carWidth: 300,
-      carHeight: 56,
-      mainText: 'text-3xl md:text-4xl',
-      subText: 'text-base md:text-lg',
-      container: 'py-5 px-6',
-      imgHeight: 'h-24 sm:h-28'
+      carWidth: 280,
+      carHeight: 52,
+      mainText: 'text-2xl sm:text-3xl md:text-4xl',
+      subText: 'text-sm sm:text-base md:text-lg',
+      container: 'py-3 px-4',
+      imgHeight: 'h-20 sm:h-24'
     },
     hero: {
-      carWidth: 380,
-      carHeight: 72,
-      mainText: 'text-4xl sm:text-5xl md:text-6xl',
-      subText: 'text-xl sm:text-2xl md:text-3xl',
-      container: 'py-8 px-6 sm:px-10',
-      imgHeight: 'h-32 sm:h-36'
+      carWidth: 350,
+      carHeight: 66,
+      mainText: 'text-3xl sm:text-4xl md:text-5xl',
+      subText: 'text-lg sm:text-xl md:text-2xl',
+      container: 'py-4 px-6',
+      imgHeight: 'h-24 sm:h-28'
     }
   }[size];
 
   return (
     <div
+      onClick={onClick}
       className={`relative inline-flex flex-col items-center justify-center select-none text-center ${
         showBackground
           ? 'bg-classic-wood-slats rounded-2xl border border-white/10 shadow-2xl shadow-black/90'
           : ''
       } ${dimensions.container} ${className}`}
     >
-      {/* If custom logo image is provided or saved, display it; otherwise render signature luxury gold emblem */}
-      {customLogoUrl && !imageError ? (
+      {/* Official store logo image */}
+      {showImage ? (
         <div className="relative flex flex-col items-center justify-center">
           <img
-            src={customLogoUrl}
+            src={logoSrc}
             alt="شعار برج الشارقة لزينة السيارات"
-            onError={() => {
-              if (customLogoUrl !== DEFAULT_LOGO_URL) {
-                setCustomLogoUrl(DEFAULT_LOGO_URL);
-              } else {
-                setImageError(true);
-              }
-            }}
+            onError={() => setImageError(true)}
             className={`${dimensions.imgHeight} w-auto max-w-full object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]`}
           />
         </div>
       ) : (
-        <>
+        <div className="flex flex-col items-center justify-center text-center">
           {/* Aerodynamic Car Silhouette Vector - Classic Metallic Gold Lighting */}
-          <div className="relative z-10 flex justify-center mb-1">
+          <div className="relative z-10 flex justify-center mb-0.5">
             <svg
               viewBox="0 0 400 70"
               fill="none"
@@ -130,7 +132,7 @@ export const Logo: React.FC<LogoProps> = ({
           {/* Main Arabic Signboard Typography: "برج الشارقة" */}
           <div className="relative z-10 font-bold tracking-tight leading-none mb-1">
             <span
-              className={`font-['Alexandria',sans-serif] font-black signboard-gold-text ${dimensions.mainText}`}
+              className={`font-['Alexandria','Tajawal',sans-serif] font-black signboard-gold-text ${dimensions.mainText}`}
             >
               برج الشارقة
             </span>
@@ -139,12 +141,12 @@ export const Logo: React.FC<LogoProps> = ({
           {/* Subtitle Arabic Signboard Typography: "لزينة السيارات" */}
           <div className="relative z-10 font-semibold tracking-wide leading-tight">
             <span
-              className={`font-['Alexandria',sans-serif] font-bold signboard-red-text ${dimensions.subText}`}
+              className={`font-['Alexandria','Tajawal',sans-serif] font-bold signboard-red-text ${dimensions.subText}`}
             >
               لزينة السيارات
             </span>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

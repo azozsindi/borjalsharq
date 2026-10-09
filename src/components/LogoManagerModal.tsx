@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Image, Upload, Check, RefreshCw, X, AlertCircle, Sparkles, CloudCheck, Link as LinkIcon } from 'lucide-react';
 import { processUploadedLogoFile, saveLogoPermanently, resetLogoToDefault, DEFAULT_LOGO_URL } from '../services/logoService';
+import { Logo } from './Logo';
 
 interface LogoManagerModalProps {
   isOpen: boolean;
@@ -114,7 +115,7 @@ export const LogoManagerModal: React.FC<LogoManagerModalProps> = ({
             </div>
             <div>
               <h3 className="text-base font-bold text-white">تثبيت وتعديل شعار المتجر</h3>
-              <p className="text-xs text-slate-400">حفظ الشعار في Cloud Firestore لمشروع borjalsharq</p>
+              <p className="text-xs text-slate-400">حفظ الشعار في Cloud Firestore لمشروع borjalsharq-39deb</p>
             </div>
           </div>
           <button
@@ -130,7 +131,7 @@ export const LogoManagerModal: React.FC<LogoManagerModalProps> = ({
         <div className="my-5 relative z-10">
           <label className="block text-xs font-semibold text-slate-300 mb-2">معاينة الشعار الحالي:</label>
           <div className="flex items-center justify-center min-h-[120px] p-4 bg-[#0a0b0e] border border-white/10 rounded-xl">
-            {previewUrl ? (
+            {previewUrl && previewUrl !== DEFAULT_LOGO_URL && previewUrl !== '/logo.svg' ? (
               <img
                 src={previewUrl}
                 alt="معاينة الشعار"
@@ -140,7 +141,7 @@ export const LogoManagerModal: React.FC<LogoManagerModalProps> = ({
                 }}
               />
             ) : (
-              <span className="text-xs text-slate-500">لا يوجد شعار محدد</span>
+              <Logo size="md" />
             )}
           </div>
         </div>
