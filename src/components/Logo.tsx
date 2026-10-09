@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { subscribeToStoreLogo, DEFAULT_LOGO_URL } from '../services/logoService';
 
 interface LogoProps {
   size?: 'sm' | 'md' | 'lg' | 'hero';
@@ -11,14 +12,15 @@ export const Logo: React.FC<LogoProps> = ({
   showBackground = false,
   className = ''
 }) => {
-  const [customLogoUrl, setCustomLogoUrl] = useState<string | null>(null);
+  const [customLogoUrl, setCustomLogoUrl] = useState<string>(DEFAULT_LOGO_URL);
   const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('borj_alsharq_custom_logo');
-      if (saved) setCustomLogoUrl(saved);
-    }
+    const unsubscribe = subscribeToStoreLogo((url) => {
+      setCustomLogoUrl(url || DEFAULT_LOGO_URL);
+      setImageError(false);
+    });
+    return () => unsubscribe();
   }, []);
 
   const dimensions = {
@@ -70,7 +72,13 @@ export const Logo: React.FC<LogoProps> = ({
           <img
             src={customLogoUrl}
             alt="شعار برج الشارقة لزينة السيارات"
-            onError={() => setImageError(true)}
+            onError={() => {
+              if (customLogoUrl !== DEFAULT_LOGO_URL) {
+                setCustomLogoUrl(DEFAULT_LOGO_URL);
+              } else {
+                setImageError(true);
+              }
+            }}
             className={`${dimensions.imgHeight} w-auto max-w-full object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)]`}
           />
         </div>

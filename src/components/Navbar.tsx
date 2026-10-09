@@ -1,26 +1,43 @@
 import React, { useState } from 'react';
-import { Phone, Menu, X, Navigation, MessageCircle, Star } from 'lucide-react';
+import { Phone, Menu, X, Navigation, MessageCircle, Star, Edit3, Image as ImageIcon } from 'lucide-react';
 import { STORE_INFO } from '../data/storeData';
 import { Logo } from './Logo';
+import { LogoManagerModal } from './LogoManagerModal';
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLogoModalOpen, setIsLogoModalOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#0c0d10]/95 backdrop-blur-md border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-4 sm:gap-6 h-20">
-          
-          {/* Brand Wordmark */}
-          <a
-            href="#hero"
-            className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c5a059] rounded-lg whitespace-nowrap shrink-0"
-            aria-label="برج الشارقة لزينة السيارات"
-          >
-            <div className="scale-75 origin-right sm:scale-85">
-              <Logo size="sm" />
+    <>
+      <header className="sticky top-0 z-40 w-full bg-[#0c0d10]/95 backdrop-blur-md border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-4 sm:gap-6 h-20">
+            
+            {/* Brand Wordmark & Logo Trigger */}
+            <div className="flex items-center gap-2 shrink-0">
+              <a
+                href="#hero"
+                className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#c5a059] rounded-lg whitespace-nowrap shrink-0 group"
+                aria-label="برج الشارقة لزينة السيارات"
+              >
+                <div className="scale-75 origin-right sm:scale-85 transition-transform group-hover:scale-90">
+                  <Logo size="sm" />
+                </div>
+              </a>
+
+              {/* Discreet Logo Edit Button for the store owner */}
+              <button
+                type="button"
+                onClick={() => setIsLogoModalOpen(true)}
+                className="inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium text-amber-300/80 hover:text-amber-200 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 hover:border-amber-400 rounded-lg transition-all"
+                title="تثبيت أو رفع شعار المتجر في Firebase"
+              >
+                <Edit3 className="w-3 h-3 text-[#d4af37]" />
+                <span className="hidden sm:inline">تثبيت / تغيير الشعار</span>
+                <span className="sm:hidden">الشعار</span>
+              </button>
             </div>
-          </a>
 
           {/* Navigation Links */}
           <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-slate-300">
@@ -178,9 +195,26 @@ export const Navbar: React.FC = () => {
               </svg>
               <span>حساب تيك توك الرسمي ({STORE_INFO.tiktokHandle})</span>
             </a>
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setIsLogoModalOpen(true);
+              }}
+              className="flex items-center justify-center gap-2 w-full py-3 text-sm font-semibold text-amber-300 bg-[#1e202d] border border-amber-500/30 rounded-xl hover:bg-[#282a3d] transition-colors"
+            >
+              <Edit3 className="w-4 h-4 text-[#d4af37]" />
+              <span>تثبيت أو رفع شعار المتجر في Firebase</span>
+            </button>
           </div>
         </div>
       )}
     </header>
+
+    <LogoManagerModal
+      isOpen={isLogoModalOpen}
+      onClose={() => setIsLogoModalOpen(false)}
+    />
+  </>
   );
 };

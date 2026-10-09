@@ -28,6 +28,12 @@ service cloud.firestore {
       allow get: if true;
     }
 
+    match /settings/{settingId} {
+      allow get: if true;
+      allow list: if true;
+      allow write: if true;
+    }
+
     match /inquiries/{inquiryId} {
       allow get: if isAdmin();
       allow list: if isAdmin();

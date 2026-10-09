@@ -1,5 +1,25 @@
 {
   "entities": {
+    "SiteSettings": {
+      "title": "SiteSettings",
+      "description": "General settings for the store including custom logo and branding",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "logoUrl": {
+          "type": "string",
+          "maxLength": 500000
+        },
+        "updatedAt": {
+          "type": "string",
+          "maxLength": 50
+        }
+      },
+      "required": ["id"]
+    },
     "CustomerInquiry": {
       "title": "CustomerInquiry",
       "description": "Customer service booking or inquiry for Borj Al Sharqah car care",
@@ -40,6 +60,10 @@
     }
   },
   "firestore": {
+    "/settings/{settingId}": {
+      "schema": "SiteSettings",
+      "description": "Store branding and site configuration settings"
+    },
     "/inquiries/{inquiryId}": {
       "schema": "CustomerInquiry",
       "description": "Customer service inquiries and car detailing booking requests"

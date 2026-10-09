@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Star, MapPin, Phone, Navigation, MessageCircle, Clock, ShieldCheck, Check, Sparkles, ExternalLink } from 'lucide-react';
 import { STORE_INFO } from '../data/storeData';
+import { Logo } from './Logo';
 
 export const Hero: React.FC = () => {
   const [isOpenNow, setIsOpenNow] = useState(false);
@@ -165,6 +166,11 @@ export const Hero: React.FC = () => {
 
                 {/* Main Card Content */}
                 <div className="py-5 space-y-4">
+                  {/* Store Official Logo Emblem */}
+                  <div className="py-3 px-2 bg-black/40 border border-white/10 rounded-xl flex items-center justify-center">
+                    <Logo size="md" />
+                  </div>
+
                   <div>
                     <h3 className="text-lg font-bold text-white flex items-center gap-2">
                       <Sparkles className="w-4 h-4 text-[#d4af37]" />
