@@ -1,10 +1,11 @@
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
-import { initAnalytics } from './firebase.ts';
+import { initAnalytics, testConnection } from './firebase.ts';
 
 // Initialize Firebase Google Analytics (G-L2DG0QBQQ5)
 initAnalytics();
+testConnection();
 
 // Prevent ResizeObserver benign loop notification errors from uncaught propagation
 window.addEventListener(

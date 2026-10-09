@@ -1,0 +1,44 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 64 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isAdmin() {
+      return request.auth != null &&
+        (request.auth.token.email == 'azozsindi23@gmail.com' || request.auth.token.email == 'AzozSindi23@gmail.com') &&
+        request.auth.token.email_verified == true;
+    }
+
+    function isValidInquiry(data) {
+      return data.keys().hasAll(['id', 'name', 'phone', 'service', 'createdAt']) &&
+        data.keys().hasOnly(['id', 'name', 'phone', 'service', 'carModel', 'notes', 'createdAt']) &&
+        data.id is string && isValidId(data.id) &&
+        data.name is string && data.name.size() >= 2 && data.name.size() <= 100 &&
+        data.phone is string && data.phone.size() >= 8 && data.phone.size() <= 20 &&
+        data.service is string && data.service.size() <= 100 &&
+        (!('carModel' in data) || (data.carModel is string && data.carModel.size() <= 100)) &&
+        (!('notes' in data) || (data.notes is string && data.notes.size() <= 500)) &&
+        data.createdAt is string && data.createdAt.size() <= 50;
+    }
+
+    match /test/connection {
+      allow get: if true;
+    }
+
+    match /inquiries/{inquiryId} {
+      allow get: if isAdmin();
+      allow list: if isAdmin();
+      allow create: if isValidId(inquiryId) &&
+                    isValidInquiry(request.resource.data) &&
+                    request.resource.data.id == inquiryId;
+      allow update: if isAdmin() &&
+                    isValidId(inquiryId) &&
+                    isValidInquiry(request.resource.data) &&
+                    request.resource.data.id == resource.data.id;
+      allow delete: if isAdmin() && isValidId(inquiryId);
+    }
+  }
+}

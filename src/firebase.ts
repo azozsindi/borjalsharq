@@ -1,5 +1,7 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAnalytics, isSupported } from 'firebase/analytics';
+import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyAc_8wbNx1xxoomVYeL6me2nB0U4TGqGoQ",
@@ -13,6 +15,8 @@ export const firebaseConfig = {
 
 // Initialize Firebase App
 export const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+export const db = getFirestore(app);
+export const auth = getAuth(app);
 
 // Initialize Google Analytics for borjalsharq
 export const initAnalytics = async () => {
@@ -28,3 +32,14 @@ export const initAnalytics = async () => {
   }
   return null;
 };
+
+// Validate Connection to Firestore
+export async function testConnection() {
+  try {
+    await getDocFromServer(doc(db, 'test', 'connection'));
+  } catch (error) {
+    if (error instanceof Error && error.message.includes('the client is offline')) {
+      console.warn("Please check your Firebase configuration.");
+    }
+  }
+}
