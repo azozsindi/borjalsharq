@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, 
   Layers, 
@@ -18,6 +18,20 @@ export const PrimoCatalogSection: React.FC = () => {
   const [selectedSection, setSelectedSection] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeModalItem, setActiveModalItem] = useState<PrimoItem | null>(null);
+
+  useEffect(() => {
+    const handleSelectSection = (e: CustomEvent<string>) => {
+      if (e.detail) {
+        setSelectedSection(e.detail);
+        const catalogEl = document.getElementById('catalog');
+        if (catalogEl) {
+          catalogEl.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    };
+    window.addEventListener('select-catalog-section' as any, handleSelectSection);
+    return () => window.removeEventListener('select-catalog-section' as any, handleSelectSection);
+  }, []);
 
   const filteredCatalog = useMemo(() => {
     return PRIMO_CATALOG.filter((item) => {
@@ -62,21 +76,21 @@ export const PrimoCatalogSection: React.FC = () => {
   };
 
   return (
-    <section id="primo-catalog" className="py-16 md:py-24 bg-[#0d0e12] border-b border-white/10 relative">
-      <div id="catalog" className="absolute -top-24 pointer-events-none" />
+    <section id="catalog" className="py-16 md:py-24 bg-[#0a0b0e] border-b border-white/10 relative">
+      <div id="primo-catalog" className="absolute -top-24 pointer-events-none" />
       <div id="calculator" className="absolute -top-24 pointer-events-none" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Block */}
         <div className="max-w-3xl mb-10">
           <span className="text-xs font-bold uppercase tracking-wider text-[#d4af37] block mb-2">
-            دليل الأصناف والتجهيزات
+            دليل المتجر
           </span>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white leading-tight">
-            الأصناف والخدمات المعتمدة لدى برج الشارقة
+            التجهيزات والإكسسوارات
           </h2>
           <p className="text-sm sm:text-base text-slate-300 mt-2.5 leading-relaxed">
-            قائمة حصرية ومتكاملة تغطي كافة تجهيزات السيارات الداخلية والخارجية، والأنظمة الكهربائية والصوتية، والتظليل العازل بأعلى مقاييس الجودة في جدة حي طيبة.
+            استعرض قائمة التجهيزات والإكسسوارات المعتمدة لسيارتك في برج الشارقة – جدة، حي طيبة.
           </p>
         </div>
 
@@ -144,7 +158,7 @@ export const PrimoCatalogSection: React.FC = () => {
           </span>
         </div>
 
-        {/* Items Grid */}
+        {/* Items Grid / Grouped Sections */}
         {filteredCatalog.length === 0 ? (
           <div className="py-16 text-center bg-[#121318] border border-white/10 rounded-2xl p-8">
             <Search className="w-8 h-8 text-slate-600 mx-auto mb-3" />
@@ -162,7 +176,104 @@ export const PrimoCatalogSection: React.FC = () => {
               عرض كافة الأصناف
             </button>
           </div>
+        ) : selectedSection === 'all' && !searchQuery.trim() ? (
+          /* Grouped by Section to avoid repeating long section names above every card */
+          <div className="space-y-12">
+            {PRIMO_SECTIONS.map((sec) => {
+              const secItems = filteredCatalog.filter((item) => item.sectionId === sec.id);
+              if (secItems.length === 0) return null;
+
+              return (
+                <div key={sec.id} className="space-y-5">
+                  {/* Single Group Heading for the section */}
+                  <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-[#191a22] border border-white/10 flex items-center justify-center text-[#d4af37]">
+                        {getSectionIcon(sec.id)}
+                      </div>
+                      <div>
+                        <h3 className="text-base sm:text-lg font-bold text-white">
+                          {getSectionRomanNumeral(sec.id)}: {sec.title}
+                        </h3>
+                        <span className="text-xs text-slate-400">{sec.count} صنفاً معتمداً</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section Items Grid */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {secItems.map((item) => {
+                      const whatsappMsg = encodeURIComponent(
+                        `السلام عليكم، أود الاستفسار عن توفر وتركيب: *${item.title}* لدى برج الشارقة لزينة السيارات بجدة حي طيبة.`
+                      );
+                      const itemWhatsappUrl = `${STORE_INFO.whatsappUrl}?text=${whatsappMsg}`;
+
+                      return (
+                        <div
+                          key={item.id}
+                          className="bg-[#121318] border border-white/10 rounded-2xl p-5 flex flex-col justify-between hover:border-white/25 transition-all shadow-sm h-full"
+                        >
+                          <div>
+                            {/* Title */}
+                            <h4 className="text-base font-bold text-white mb-2 leading-snug">
+                              {item.title}
+                            </h4>
+
+                            {/* Brief Description on Card */}
+                            <p className="text-xs text-slate-400 leading-relaxed mb-3 line-clamp-2" title={item.description}>
+                              {item.description}
+                            </p>
+
+                            {/* Top Tags (Compact) */}
+                            {item.tags && item.tags.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5 mb-4">
+                                {item.tags.slice(0, 2).map((t, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="text-[10px] text-slate-300 bg-[#0a0b0e] border border-white/5 px-2 py-0.5 rounded"
+                                  >
+                                    {t}
+                                  </span>
+                                ))}
+                                {item.tags.length > 2 && (
+                                  <span className="text-[10px] text-slate-500 bg-[#0a0b0e] border border-white/5 px-1.5 py-0.5 rounded">
+                                    +{item.tags.length - 2}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Actions */}
+                          <div className="pt-3.5 border-t border-white/10 flex items-center justify-between gap-2 mt-auto">
+                            <button
+                              onClick={() => setActiveModalItem(item)}
+                              className="text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1 py-1 px-2 rounded-lg hover:bg-white/5 transition-colors"
+                            >
+                              <span>تفاصيل الصنف</span>
+                              <ArrowUpRight className="w-3.5 h-3.5 text-[#d4af37]" />
+                            </button>
+
+                            <a
+                              href={itemWhatsappUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-950 bg-[#c5a059] hover:bg-[#d4af37] rounded-lg transition-colors whitespace-nowrap active:scale-95"
+                            >
+                              <MessageCircle className="w-3.5 h-3.5" />
+                              <span>استفسار واتساب</span>
+                            </a>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         ) : (
+          /* Filtered or Search View */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredCatalog.map((item) => {
               const whatsappMsg = encodeURIComponent(
@@ -170,47 +281,54 @@ export const PrimoCatalogSection: React.FC = () => {
               );
               const itemWhatsappUrl = `${STORE_INFO.whatsappUrl}?text=${whatsappMsg}`;
 
+              const currentSec = PRIMO_SECTIONS.find(s => s.id === item.sectionId);
+
               return (
                 <div
                   key={item.id}
-                  className="bg-[#121318] border border-white/10 rounded-2xl p-5 sm:p-6 flex flex-col justify-between hover:border-white/25 transition-colors"
+                  className="bg-[#121318] border border-white/10 rounded-2xl p-5 flex flex-col justify-between hover:border-white/25 transition-all shadow-sm h-full"
                 >
                   <div>
-                    {/* Category Label */}
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <span className="text-[11px] font-bold text-slate-300 flex items-center gap-1.5">
+                    {/* Compact Section Badge */}
+                    <div className="flex items-center justify-between gap-2 mb-2.5">
+                      <span className="text-[11px] font-semibold text-[#d4af37] flex items-center gap-1 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
                         {getSectionIcon(item.sectionId)}
-                        <span>{getSectionRomanNumeral(item.sectionId)}: {item.sectionName}</span>
+                        <span>{currentSec?.shortTitle || item.sectionName}</span>
                       </span>
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-base font-bold text-white mb-2 leading-snug">
+                    <h4 className="text-base font-bold text-white mb-2 leading-snug">
                       {item.title}
-                    </h3>
+                    </h4>
 
-                    {/* Description */}
-                    <p className="text-xs sm:text-sm text-slate-400 leading-relaxed mb-4">
+                    {/* Brief Description on Card */}
+                    <p className="text-xs text-slate-400 leading-relaxed mb-3 line-clamp-2" title={item.description}>
                       {item.description}
                     </p>
 
-                    {/* Tags */}
+                    {/* Top Tags (Compact) */}
                     {item.tags && item.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1.5 mb-5">
-                        {item.tags.map((t, idx) => (
+                      <div className="flex flex-wrap gap-1.5 mb-4">
+                        {item.tags.slice(0, 2).map((t, idx) => (
                           <span
                             key={idx}
-                            className="text-[10px] text-slate-400 bg-[#0a0b0e] border border-white/5 px-2 py-0.5 rounded"
+                            className="text-[10px] text-slate-300 bg-[#0a0b0e] border border-white/5 px-2 py-0.5 rounded"
                           >
                             {t}
                           </span>
                         ))}
+                        {item.tags.length > 2 && (
+                          <span className="text-[10px] text-slate-500 bg-[#0a0b0e] border border-white/5 px-1.5 py-0.5 rounded">
+                            +{item.tags.length - 2}
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>
 
                   {/* Actions */}
-                  <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-2">
+                  <div className="pt-3.5 border-t border-white/10 flex items-center justify-between gap-2 mt-auto">
                     <button
                       onClick={() => setActiveModalItem(item)}
                       className="text-xs font-semibold text-slate-300 hover:text-white flex items-center gap-1 py-1 px-2 rounded-lg hover:bg-white/5 transition-colors"
@@ -223,7 +341,7 @@ export const PrimoCatalogSection: React.FC = () => {
                       href={itemWhatsappUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-950 bg-[#c5a059] hover:bg-[#d4af37] rounded-lg transition-colors whitespace-nowrap"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-950 bg-[#c5a059] hover:bg-[#d4af37] rounded-lg transition-colors whitespace-nowrap active:scale-95"
                     >
                       <MessageCircle className="w-3.5 h-3.5" />
                       <span>استفسار واتساب</span>

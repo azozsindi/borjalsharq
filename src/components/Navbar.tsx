@@ -68,18 +68,30 @@ export const Navbar: React.FC = () => {
             </div>
 
             {/* Navigation Links (Desktop) */}
-            <nav className="hidden lg:flex items-center gap-7 text-sm font-medium text-slate-300">
+            <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-300">
               <a
-                href="#overview"
+                href="#hero"
                 className="hover:text-[#e2c174] transition-colors whitespace-nowrap shrink-0"
               >
-                لمحة عن المتجر
+                الرئيسية
               </a>
               <a
-                href="#primo-catalog"
+                href="#services"
+                className="hover:text-[#e2c174] transition-colors whitespace-nowrap shrink-0"
+              >
+                الخدمات
+              </a>
+              <a
+                href="#catalog"
                 className="text-[#e2c174] hover:text-[#f4d896] transition-colors whitespace-nowrap shrink-0 font-semibold"
               >
-                دليل الأصناف والتجهيزات (44 صنفاً)
+                التجهيزات
+              </a>
+              <a
+                href="#advantages"
+                className="hover:text-[#e2c174] transition-colors whitespace-nowrap shrink-0"
+              >
+                مميزاتنا
               </a>
               <a
                 href="#reviews"
@@ -91,7 +103,7 @@ export const Navbar: React.FC = () => {
                 href="#location"
                 className="hover:text-[#e2c174] transition-colors whitespace-nowrap shrink-0"
               >
-                موقع المتجر وساعات العمل
+                موقعنا
               </a>
             </nav>
 
@@ -119,19 +131,8 @@ export const Navbar: React.FC = () => {
               </a>
             </div>
 
-            {/* Mobile Top Actions: Direct Review Button + Call + Drawer Toggle */}
+            {/* Mobile Top Actions: Direct Call + Drawer Toggle */}
             <div className="flex lg:hidden items-center gap-2 shrink-0">
-              <a
-                href={STORE_INFO.googleMapsWriteReviewUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-2.5 py-2 text-xs font-bold text-amber-200 bg-amber-500/20 border border-amber-500/50 hover:bg-amber-500/30 rounded-xl active:scale-95 transition-all shadow-sm"
-                aria-label="قيّمنا على Google Maps"
-              >
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                <span>قيّمنا ⭐</span>
-              </a>
-
               <a
                 href={`tel:${STORE_INFO.phoneRaw}`}
                 className="p-2.5 text-slate-950 bg-[#c5a059] rounded-xl hover:bg-[#d4af37] transition-colors active:scale-95"
@@ -158,20 +159,36 @@ export const Navbar: React.FC = () => {
           <div className="lg:hidden bg-[#0c0d10]/98 backdrop-blur-xl border-b border-white/10 px-5 py-6 space-y-5 animate-in slide-in-from-top duration-200 shadow-2xl">
             <nav className="flex flex-col space-y-3.5 text-base font-medium text-slate-200">
               <a
-                href="#overview"
+                href="#hero"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-white/5 hover:text-[#e2c174] transition-colors"
               >
-                <span>لمحة عن المتجر</span>
+                <span>الرئيسية</span>
                 <span className="text-slate-500 text-xs">←</span>
               </a>
               <a
-                href="#primo-catalog"
+                href="#services"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-white/5 hover:text-[#e2c174] transition-colors"
+              >
+                <span>الخدمات</span>
+                <span className="text-slate-500 text-xs">←</span>
+              </a>
+              <a
+                href="#catalog"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center justify-between py-2 px-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[#e2c174] font-bold transition-colors"
               >
-                <span>دليل الأصناف والتجهيزات (44 صنفاً)</span>
+                <span>التجهيزات (44 صنفاً)</span>
                 <span className="text-amber-400 text-xs">←</span>
+              </a>
+              <a
+                href="#advantages"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-white/5 hover:text-[#e2c174] transition-colors"
+              >
+                <span>مميزاتنا</span>
+                <span className="text-slate-500 text-xs">←</span>
               </a>
               <a
                 href="#reviews"
@@ -186,7 +203,7 @@ export const Navbar: React.FC = () => {
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-white/5 hover:text-[#e2c174] transition-colors"
               >
-                <span>الموقع وساعات العمل</span>
+                <span>موقعنا وساعات العمل</span>
                 <span className="text-slate-500 text-xs">←</span>
               </a>
             </nav>

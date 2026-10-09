@@ -26,7 +26,7 @@ export const Footer: React.FC = () => {
 
           {/* Quick Nav (Zone 2) */}
           <div>
-            <h4 className="text-sm font-bold text-white mb-4">أقسام الصفحة</h4>
+            <h4 className="text-sm font-bold text-white mb-4">أقسام الموقع</h4>
             <ul className="space-y-2.5 text-xs sm:text-sm">
               <li>
                 <a href="#overview" className="hover:text-[#e2c174] transition-colors">
@@ -34,18 +34,33 @@ export const Footer: React.FC = () => {
                 </a>
               </li>
               <li>
+                <a href="#services" className="hover:text-[#e2c174] transition-colors">
+                  الخدمات الأكثر طلباً
+                </a>
+              </li>
+              <li>
                 <a href="#primo-catalog" className="hover:text-[#e2c174] transition-colors font-semibold text-slate-200">
-                  دليل الأصناف والتجهيزات (44 صنفاً)
+                  دليل الأصناف (44 صنفاً)
+                </a>
+              </li>
+              <li>
+                <a href="#advantages" className="hover:text-[#e2c174] transition-colors">
+                  مميزات المتجر
                 </a>
               </li>
               <li>
                 <a href="#reviews" className="hover:text-[#e2c174] transition-colors">
-                  تقييمات العملاء (4.3 ⭐)
+                  تقييمات العملاء
                 </a>
               </li>
               <li>
                 <a href="#location" className="hover:text-[#e2c174] transition-colors">
-                  موقع المتجر وساعات العمل
+                  الموقع وساعات العمل
+                </a>
+              </li>
+              <li>
+                <a href="#faq" className="hover:text-[#e2c174] transition-colors">
+                  الأسئلة الشائعة
                 </a>
               </li>
             </ul>
@@ -126,7 +141,22 @@ export const Footer: React.FC = () => {
 
         {/* Copyright */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} {STORE_INFO.name} - جدة، المملكة العربية السعودية.</p>
+          <div className="flex items-center gap-2">
+            <p>© {new Date().getFullYear()} {STORE_INFO.name} - جدة، المملكة العربية السعودية.</p>
+            {/* Discreet hidden logo manager button - invisible to customers, accessible to owner */}
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('open-logo-manager'));
+                }
+              }}
+              className="opacity-0 hover:opacity-100 focus:opacity-100 transition-opacity px-2 py-0.5 text-[11px] text-amber-500/80 hover:text-amber-400 bg-white/5 hover:bg-white/10 rounded cursor-pointer"
+              title="تثبيت وتعديل الشعار (خاص بالإدارة)"
+            >
+              تثبيت الشعار ⚙️
+            </button>
+          </div>
           <div className="flex items-center gap-3 text-slate-500">
             <span>التسوّق والتركيب داخل المتجر</span>
             <span aria-hidden="true">·</span>

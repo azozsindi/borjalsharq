@@ -2,7 +2,9 @@ import React from 'react';
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { OverviewSection } from './components/OverviewSection';
+import { PopularServicesSection } from './components/PopularServicesSection';
 import { PrimoCatalogSection } from './components/PrimoCatalogSection';
+import { StoreAdvantagesSection } from './components/StoreAdvantagesSection';
 import { ReviewsSection } from './components/ReviewsSection';
 import { GoogleMapsLocation } from './components/GoogleMapsLocation';
 import { FAQSection } from './components/FAQSection';
@@ -15,28 +17,34 @@ export default function App() {
       {/* Top Bar Navigation */}
       <Navbar />
 
-      {/* Main Content Sections */}
+      {/* Main Content Sections in Exact Required Order */}
       <main className="flex-1">
-        {/* 01. Hero with Official Signboard */}
+        {/* 01. الواجهة الرئيسية: عنوان واضح، وصف مختصر، وأبرز الخدمات */}
         <Hero />
 
-        {/* 02. Overview of the Store */}
+        {/* 02. لمحة عن المتجر: نبذة مختصرة عن المعرض في حي طيبة بجدة دون تكرار */}
         <OverviewSection />
 
-        {/* 03. Comprehensive Primo Catalog (44 Items - No Prices) */}
+        {/* 03. الخدمات الأكثر طلباً: التظليل، تلبيس المقاعد، خياطة الدركسون، الشاشات، الإنارة والصوتيات */}
+        <PopularServicesSection />
+
+        {/* 04. دليل الأصناف والتجهيزات: جميع الأصناف الـ44 مع البحث والتصنيفات */}
         <PrimoCatalogSection />
 
-        {/* 04. Customer Reviews (4.3 ⭐, 55 reviews) */}
+        {/* 05. مميزات المتجر: فك التظليل بدون خدش، أسلاك مخفية، بضاعة ممتازة، وسرعة الإنجاز */}
+        <StoreAdvantagesSection />
+
+        {/* 06. تقييمات العملاء: أداة تقييمات Google المباشرة دون أي تعديل */}
         <ReviewsSection />
 
-        {/* 05. Exact Google Maps Location & Hours */}
+        {/* 07. موقع المتجر وساعات العمل: العنوان والخريطة وأوقات العمل ورقم الاتصال */}
         <GoogleMapsLocation />
 
-        {/* 06. Frequently Asked Questions */}
+        {/* 08. الأسئلة الشائعة: بطاقات قابلة للفتح والإغلاق */}
         <FAQSection />
       </main>
 
-      {/* Quiet Footer */}
+      {/* 09. التذييل: روابط الأقسام وبيانات التواصل وحقوق النشر */}
       <Footer />
 
       {/* Mobile Quick Action Bar */}
