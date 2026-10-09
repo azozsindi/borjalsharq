@@ -58,7 +58,7 @@ export const Hero: React.FC = () => {
             </div>
 
             {/* Headline */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-[1.3] tracking-tight">
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-black text-white leading-snug sm:leading-[1.3] tracking-tight">
               وجهتكم الأولى لتجهيز وتطوير وتزيين السيارات في{' '}
               <span className="text-[#e2c174]">
                 برج الشارقة
@@ -66,12 +66,12 @@ export const Hero: React.FC = () => {
             </h1>
 
             {/* Value Proposition */}
-            <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl">
+            <p className="text-sm sm:text-base md:text-lg text-slate-300 leading-relaxed max-w-2xl">
               نقدم لكم تشكيلة حصرية ومتكاملة من إكسسوارات السيارات، والزينة الداخلية والخارجية، وأنظمة الإنارة والصوتيات، والتلبيسات وحمايات السيارات لتناسب مختلف الأنواع والأذواق بأعلى معايير الجودة والأناقة.
             </p>
 
             {/* Core Pillars */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 text-xs sm:text-sm text-slate-300 pt-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-x-6 sm:gap-y-3 text-xs sm:text-sm text-slate-300 pt-1 w-full">
               <div className="flex items-center gap-2.5">
                 <span className="w-4 h-4 rounded-full bg-amber-400/10 border border-amber-400/30 flex items-center justify-center shrink-0">
                   <Check className="w-3 h-3 text-[#d4af37]" />
@@ -99,7 +99,7 @@ export const Hero: React.FC = () => {
             </div>
 
             {/* Clean, Pristine Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-3 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-3 w-full sm:w-auto">
               {/* WhatsApp */}
               <a
                 href={STORE_INFO.whatsappUrl}

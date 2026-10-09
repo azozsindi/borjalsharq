@@ -57,12 +57,12 @@ export const ReviewsSection: React.FC = () => {
           </div>
 
           {/* Direct Google Action */}
-          <div className="flex items-center">
+          <div className="flex items-center w-full md:w-auto">
             <a
               href={STORE_INFO.googleMapsReviewsUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-5 py-3 text-xs sm:text-sm font-bold text-slate-950 bg-[#c5a059] hover:bg-[#d4af37] rounded-xl transition-all shadow-sm active:scale-98"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 text-xs sm:text-sm font-bold text-slate-950 bg-[#c5a059] hover:bg-[#d4af37] rounded-xl transition-all shadow-sm active:scale-98"
             >
               <span>مشاهدة كافة التقييمات على خرائط Google</span>
               <ExternalLink className="w-4 h-4" />

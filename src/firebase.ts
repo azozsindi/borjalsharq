@@ -5,12 +5,12 @@ import { getAuth } from 'firebase/auth';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyAc_8wbNx1xxoomVYeL6me2nB0U4TGqGoQ",
-  authDomain: "borjalsharq.firebaseapp.com",
-  projectId: "borjalsharq",
-  storageBucket: "borjalsharq.firebasestorage.app",
-  messagingSenderId: "344606701994",
-  appId: "1:344606701994:web:9f92f8aa472f1189eb93d3",
-  measurementId: "G-L2DG0QBQQ5"
+  authDomain: "borjalsharq-39deb.firebaseapp.com",
+  projectId: "borjalsharq-39deb",
+  storageBucket: "borjalsharq-39deb.firebasestorage.app",
+  messagingSenderId: "1026356200114",
+  appId: "1:1026356200114:web:ed54969a6656beea39ffab",
+  measurementId: "G-WFSC8HN45M"
 };
 
 // Initialize Firebase App

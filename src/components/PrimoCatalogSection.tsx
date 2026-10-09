@@ -102,12 +102,12 @@ export const PrimoCatalogSection: React.FC = () => {
           </div>
 
           {/* Section Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pt-2 border-t border-white/5">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-2 border-t border-white/5 scrollbar-none" style={{ WebkitOverflowScrolling: 'touch' }}>
             <button
               onClick={() => setSelectedSection('all')}
-              className={`px-4 py-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap shrink-0 flex items-center gap-2 ${
+              className={`px-3.5 sm:px-4 py-2 text-xs font-bold rounded-xl transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 sm:gap-2 active:scale-95 ${
                 selectedSection === 'all'
-                  ? 'bg-[#c5a059] text-slate-950'
+                  ? 'bg-[#c5a059] text-slate-950 shadow-sm'
                   : 'bg-[#0c0d10] border border-white/10 text-slate-300 hover:text-white'
               }`}
             >
@@ -119,9 +119,9 @@ export const PrimoCatalogSection: React.FC = () => {
               <button
                 key={sec.id}
                 onClick={() => setSelectedSection(sec.id)}
-                className={`px-4 py-2 text-xs font-bold rounded-xl border transition-all whitespace-nowrap shrink-0 flex items-center gap-2 ${
+                className={`px-3.5 sm:px-4 py-2 text-xs font-bold rounded-xl border transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 sm:gap-2 active:scale-95 ${
                   selectedSection === sec.id
-                    ? 'bg-[#c5a059] border-[#c5a059] text-slate-950'
+                    ? 'bg-[#c5a059] border-[#c5a059] text-slate-950 shadow-sm'
                     : 'bg-[#0c0d10] border-white/10 text-slate-300 hover:text-white hover:border-white/20'
                 }`}
               >
@@ -246,19 +246,19 @@ export const PrimoCatalogSection: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 shrink-0">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 shrink-0 w-full md:w-auto">
             <a
               href={`${STORE_INFO.whatsappUrl}?text=${encodeURIComponent('السلام عليكم، أود الاستفسار عن توفير قطعة وتجهيز خاص لسيارتي لدى برج الشارقة.')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-5 py-3 text-xs sm:text-sm font-bold text-slate-950 bg-[#c5a059] hover:bg-[#d4af37] rounded-xl transition-all whitespace-nowrap"
+              className="flex items-center justify-center gap-2 px-5 py-3 text-xs sm:text-sm font-bold text-slate-950 bg-[#c5a059] hover:bg-[#d4af37] rounded-xl transition-all whitespace-nowrap active:scale-98 shadow-sm"
             >
               <MessageCircle className="w-4 h-4" />
               <span>استفسار خاص عبر الواتساب</span>
             </a>
             <a
               href={`tel:${STORE_INFO.phoneRaw}`}
-              className="flex items-center gap-2 px-4 py-3 text-xs sm:text-sm font-semibold text-white bg-[#0a0b0e] border border-white/10 hover:bg-white/5 rounded-xl transition-colors whitespace-nowrap"
+              className="flex items-center justify-center gap-2 px-4 py-3 text-xs sm:text-sm font-semibold text-white bg-[#0a0b0e] border border-white/10 hover:bg-white/5 rounded-xl transition-colors whitespace-nowrap active:scale-98"
             >
               <PhoneCall className="w-4 h-4 text-[#d4af37] shrink-0" />
               <span>اتصال:</span>

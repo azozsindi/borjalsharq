@@ -24,14 +24,12 @@ service cloud.firestore {
         data.createdAt is string && data.createdAt.size() <= 50;
     }
 
-    match /test/connection {
-      allow get: if true;
+    match /test/{docId} {
+      allow read, write: if true;
     }
 
     match /settings/{settingId} {
-      allow get: if true;
-      allow list: if true;
-      allow write: if true;
+      allow read, write: if true;
     }
 
     match /inquiries/{inquiryId} {
