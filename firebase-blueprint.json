@@ -57,6 +57,30 @@
         }
       },
       "required": ["id", "name", "phone", "service", "createdAt"]
+    },
+    "AdminUser": {
+      "title": "AdminUser",
+      "description": "Authorized administrator user profile for Borj Al Sharq store management",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "superadmin"]
+        },
+        "createdAt": {
+          "type": "string",
+          "maxLength": 50
+        }
+      },
+      "required": ["id", "email", "role"]
     }
   },
   "firestore": {
@@ -67,6 +91,10 @@
     "/inquiries/{inquiryId}": {
       "schema": "CustomerInquiry",
       "description": "Customer service inquiries and car detailing booking requests"
+    },
+    "/admins/{adminId}": {
+      "schema": "AdminUser",
+      "description": "Authorized administrator users registry"
     }
   }
 }

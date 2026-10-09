@@ -1,7 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Image, Upload, Check, RefreshCw, X, AlertCircle, Sparkles, CloudCheck, Link as LinkIcon } from 'lucide-react';
+import { 
+  Image, 
+  Upload, 
+  Check, 
+  RefreshCw, 
+  X, 
+  AlertCircle, 
+  Sparkles, 
+  CloudCheck, 
+  Link as LinkIcon,
+  ShieldCheck,
+  ShieldAlert,
+  LogIn,
+  LogOut
+} from 'lucide-react';
+import { GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, User } from 'firebase/auth';
+import { auth } from '../firebase';
 import { processUploadedLogoFile, saveLogoPermanently, resetLogoToDefault, DEFAULT_LOGO_URL } from '../services/logoService';
 import { Logo } from './Logo';
+
+const ADMIN_EMAIL = 'azozsindi23@gmail.com';
 
 interface LogoManagerModalProps {
   isOpen: boolean;
@@ -21,7 +39,16 @@ export const LogoManagerModal: React.FC<LogoManagerModalProps> = ({
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -32,6 +59,32 @@ export const LogoManagerModal: React.FC<LogoManagerModalProps> = ({
   }, [isOpen, currentLogoUrl]);
 
   if (!isOpen) return null;
+
+  const isCurrentAdmin = Boolean(
+    currentUser && currentUser.email && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()
+  );
+
+  const handleGoogleSignIn = async () => {
+    setIsAuthLoading(true);
+    setErrorMessage(null);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+    } catch (err: any) {
+      console.error('Google Sign In error:', err);
+      setErrorMessage('تعذر تسجيل الدخول بحساب Google: ' + (err.message || 'خطأ غير متوقع'));
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error('Sign out error:', err);
+    }
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -73,9 +126,14 @@ export const LogoManagerModal: React.FC<LogoManagerModalProps> = ({
         setIsSaving(false);
         onClose();
       }, 1500);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Save logo error:', err);
-      setErrorMessage('حدث خطأ أثناء الحفظ في Firebase. تم الحفظ محلياً على جهازك.');
+      const isPermission = err?.code?.includes('permission-denied') || err?.message?.includes('permission');
+      if (isPermission) {
+        setErrorMessage('تم رفض الحفظ من قواعد الأمان (غير مصرح): يجب تسجيل الدخول بحساب المدير azozsindi23@gmail.com.');
+      } else {
+        setErrorMessage('تعذر الحفظ في خادم Firebase. تم الحفظ محلياً في متصفحك.');
+      }
       setIsSaving(false);
     }
   };
@@ -92,8 +150,12 @@ export const LogoManagerModal: React.FC<LogoManagerModalProps> = ({
         setIsSaving(false);
         onClose();
       }, 1200);
-    } catch (err) {
+    } catch (err: any) {
       console.error('Reset error:', err);
+      const isPermission = err?.code?.includes('permission-denied') || err?.message?.includes('permission');
+      if (isPermission) {
+        setErrorMessage('تم رفض الاستعادة: غير مصرح لك بتعديل بيانات المتجر دون تسجيل دخول المدير.');
+      }
       setIsSaving(false);
     }
   };
@@ -125,6 +187,53 @@ export const LogoManagerModal: React.FC<LogoManagerModalProps> = ({
           >
             <X className="w-5 h-5" />
           </button>
+        </div>
+
+        {/* Admin Authentication & Security Status */}
+        <div className="mt-4 mb-2 p-3 rounded-xl bg-zinc-950/80 border border-white/10 relative z-10 flex items-center justify-between gap-3">
+          {currentUser ? (
+            isCurrentAdmin ? (
+              <div className="flex items-center gap-2 text-xs text-emerald-400">
+                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>
+                  المدير المعتمد: <strong>{currentUser.email}</strong> (مصرح له بالكتابة ✓)
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-xs text-rose-400">
+                <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0" />
+                <span>
+                  مسجل بـ {currentUser.email} (غير مصرح كمدير)
+                </span>
+              </div>
+            )
+          ) : (
+            <div className="flex items-center gap-2 text-xs text-amber-300">
+              <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>يتطلب تسجيل دخول المدير لحفظ التعديلات في السحابة</span>
+            </div>
+          )}
+
+          {currentUser ? (
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="text-[11px] text-slate-400 hover:text-white px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 flex items-center gap-1 shrink-0 transition-colors"
+            >
+              <LogOut className="w-3 h-3" />
+              <span>خروج</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={isAuthLoading}
+              className="text-[11px] font-semibold text-slate-900 bg-amber-400 hover:bg-amber-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5 shrink-0 transition-all shadow-sm disabled:opacity-50"
+            >
+              <LogIn className="w-3.5 h-3.5" />
+              <span>{isAuthLoading ? 'جاري الاتصال...' : 'دخول بحساب Google'}</span>
+            </button>
+          )}
         </div>
 
         {/* Preview Area */}

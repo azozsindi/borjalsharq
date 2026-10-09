@@ -19,40 +19,46 @@ export async function runFirebaseDiagnostics(): Promise<DiagnosticsResult> {
   const database = '(default)';
 
   try {
-    const testDocRef = doc(db, 'settings', 'site_health_check');
-    
-    // Step 1: Attempt Write
-    await setDoc(testDocRef, {
-      lastTested: new Date().toISOString(),
-      source: 'borjalsharq_diagnostic',
-      app: 'برج الشارقة لزينة السيارات',
-      status: 'active'
-    }, { merge: true });
-
-    // Step 2: Attempt Read
-    const snap = await getDoc(testDocRef);
+    // Step 1: Read Test (Public setting document)
+    const siteDocRef = doc(db, 'settings', 'site');
+    const snap = await getDoc(siteDocRef);
     const latencyMs = Date.now() - startTime;
 
-    if (snap.exists()) {
+    // Step 2: Write Probe (Verifies whether current session has admin write permission)
+    let canWrite = false;
+    try {
+      const testDocRef = doc(db, 'settings', 'site_health_check');
+      await setDoc(testDocRef, {
+        lastTested: new Date().toISOString(),
+        source: 'borjalsharq_diagnostic',
+        status: 'active'
+      }, { merge: true });
+      canWrite = true;
+    } catch {
+      canWrite = false;
+    }
+
+    if (canWrite) {
       return {
         success: true,
         code: 'CONNECTED',
-        message: 'تم الاتصال وقراءة/كتابة البيانات في قاعدة بيانات borjalsharq بنجاح تام!',
+        message: 'تم الاتصال بنجاح مع صلاحية كاملة (قراءة + كتابة للإدارة)!',
         projectId,
         database,
         latencyMs,
         testedAt,
-        details: 'قاعدة البيانات متصلة وتستقبل التحديثات الفورية بشكل سليم 100%.'
+        details: 'قاعدة البيانات متصلة وجلسة الإدارة مصرح لها بالكتابة وتحديث البيانات.'
       };
     } else {
       return {
         success: true,
         code: 'CONNECTED',
-        message: 'الاتصال يعمل ولكن المستند لم يُرجع بيانات.',
+        message: 'الاتصال يعمل وقراءة البيانات نشطة (قواعد الأمان تحمي الكتابة لغير المدير).',
         projectId,
         database,
         latencyMs,
-        testedAt
+        testedAt,
+        details: 'الزوار يستطيعون قراءة محتوى الموقع والشعار بسرعة، بينما تمنع قواعد الأمان أي تعديل غير مصرح به.'
       };
     }
   } catch (error: any) {

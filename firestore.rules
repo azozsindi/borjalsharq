@@ -2,16 +2,40 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // =========================================================================
+    // 1. دوال التحقق الأمنية والصلاحيات (Security & RBAC Helpers)
+    // =========================================================================
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // التحقق الصارم من هوية المدير:
+    // 1) البريد المعتمد للمالك (مع شرط التحقق من البريد email_verified لتفادي انتحال الشخصية)
+    // 2) أو وجود معرّف المستخدم (UID) في سجل الإدارة الموثوق /admins/{uid}
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email != null &&
+         request.auth.token.email.lower() == 'azozsindi23@gmail.com' &&
+         request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
     function isValidId(id) {
       return id is string && id.size() > 0 && id.size() <= 64 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
-    function isAdmin() {
-      return request.auth != null &&
-        (request.auth.token.email == 'azozsindi23@gmail.com' || request.auth.token.email == 'AzozSindi23@gmail.com') &&
-        request.auth.token.email_verified == true;
+    // التحقق من صحة حقول إعدادات المتجر والشعار
+    function isValidSiteSettings(data) {
+      return data.keys().hasAll(['id']) &&
+        data.keys().hasOnly(['id', 'logoUrl', 'updatedAt']) &&
+        data.id is string && data.id.size() <= 32 &&
+        (!('logoUrl' in data) || (data.logoUrl is string && data.logoUrl.size() <= 600000)) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 50));
     }
 
+    // التحقق الصارم من استفسارات وحجوزات العملاء لمنع الحقول العشوائية أو البيانات الضارة
     function isValidInquiry(data) {
       return data.keys().hasAll(['id', 'name', 'phone', 'service', 'createdAt']) &&
         data.keys().hasOnly(['id', 'name', 'phone', 'service', 'carModel', 'notes', 'createdAt']) &&
@@ -24,17 +48,27 @@ service cloud.firestore {
         data.createdAt is string && data.createdAt.size() <= 50;
     }
 
-    match /test/{docId} {
-      allow read, write: if true;
-    }
+    // =========================================================================
+    // 2. قواعد المجموعات المستهدفة
+    // =========================================================================
 
+    // 01. إعدادات الموقع والشعار (settings)
+    // - القراءة الفردية (get): عامة ومتاحة لجميع الزوار لعرض الشعار وبيانات المتجر.
+    // - القائمة (list): محصورة بالمدير فقط.
+    // - الكتابة والتعديل والحذف: محصورة بالمدير المعتمد فقط.
     match /settings/{settingId} {
-      allow read, write: if true;
+      allow get: if true;
+      allow list: if isAdmin();
+      allow create, update: if isAdmin() && isValidSiteSettings(request.resource.data);
+      allow delete: if isAdmin();
     }
 
+    // 02. استفسارات وحجوزات العملاء (inquiries)
+    // - الإنشاء (create): متاح للعملاء لتقديم الطلبات مع التحقق الصارم من الحقول.
+    // - القراءة والسرد (get, list): محصورة بالمدير فقط (حظر الزوار لحماية أرقام وبيانات العملاء PII).
+    // - التعديل والحذف: للمدير فقط.
     match /inquiries/{inquiryId} {
-      allow get: if isAdmin();
-      allow list: if isAdmin();
+      allow get, list: if isAdmin();
       allow create: if isValidId(inquiryId) &&
                     isValidInquiry(request.resource.data) &&
                     request.resource.data.id == inquiryId;
@@ -44,5 +78,26 @@ service cloud.firestore {
                     request.resource.data.id == resource.data.id;
       allow delete: if isAdmin() && isValidId(inquiryId);
     }
+
+    // 03. سجل صلاحيات الإدارة (admins)
+    // محصورة تماماً بالمدير المعتمد
+    match /admins/{adminId} {
+      allow read, write: if isAdmin();
+    }
+
+    // 04. فحص الاتصال (test)
+    // السماح بالقراءة الفردية للتأكد من حالة السيرفر، وحظر الكتابة لغير المدير
+    match /test/{docId} {
+      allow get: if true;
+      allow list, write: if isAdmin();
+    }
+
+    // =========================================================================
+    // 3. القاعدة الافتراضية الصارمة: حظر أي قراءة أو كتابة غير معرّفة (Default Deny)
+    // =========================================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
   }
 }
+

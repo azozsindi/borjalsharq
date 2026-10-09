@@ -29,21 +29,79 @@ export const FirebaseHealthModal: React.FC<Props> = ({ isOpen, onClose }) => {
   const sampleRules = `rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // السماح بإعدادات المتجر والشعار
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        (request.auth.token.email != null &&
+         request.auth.token.email.lower() == 'azozsindi23@gmail.com' &&
+         request.auth.token.email_verified == true) ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 64 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isValidSiteSettings(data) {
+      return data.keys().hasAll(['id']) &&
+        data.keys().hasOnly(['id', 'logoUrl', 'updatedAt']) &&
+        data.id is string && data.id.size() <= 32 &&
+        (!('logoUrl' in data) || (data.logoUrl is string && data.logoUrl.size() <= 600000)) &&
+        (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 50));
+    }
+
+    function isValidInquiry(data) {
+      return data.keys().hasAll(['id', 'name', 'phone', 'service', 'createdAt']) &&
+        data.keys().hasOnly(['id', 'name', 'phone', 'service', 'carModel', 'notes', 'createdAt']) &&
+        data.id is string && isValidId(data.id) &&
+        data.name is string && data.name.size() >= 2 && data.name.size() <= 100 &&
+        data.phone is string && data.phone.size() >= 8 && data.phone.size() <= 20 &&
+        data.service is string && data.service.size() <= 100 &&
+        (!('carModel' in data) || (data.carModel is string && data.carModel.size() <= 100)) &&
+        (!('notes' in data) || (data.notes is string && data.notes.size() <= 500)) &&
+        data.createdAt is string && data.createdAt.size() <= 50;
+    }
+
+    // إعدادات الموقع والشعار: قراءة فردية للزوار وكتابة للمدير فقط
     match /settings/{settingId} {
-      allow read, write: if true;
+      allow get: if true;
+      allow list: if isAdmin();
+      allow create, update: if isAdmin() && isValidSiteSettings(request.resource.data);
+      allow delete: if isAdmin();
     }
-    // السماح باستفسارات وحجوزات العملاء
+
+    // استفسارات العملاء: إنشاء للزوار وقراءة وتعديل للمدير فقط (حماية البيانات)
     match /inquiries/{inquiryId} {
-      allow read, write: if true;
+      allow get, list: if isAdmin();
+      allow create: if isValidId(inquiryId) &&
+                    isValidInquiry(request.resource.data) &&
+                    request.resource.data.id == inquiryId;
+      allow update: if isAdmin() &&
+                    isValidId(inquiryId) &&
+                    isValidInquiry(request.resource.data) &&
+                    request.resource.data.id == resource.data.id;
+      allow delete: if isAdmin() && isValidId(inquiryId);
     }
-    // السماح بفحص الاتصال
+
+    // سجل المديرين
+    match /admins/{adminId} {
+      allow read, write: if isAdmin();
+    }
+
+    // فحص الاتصال
     match /test/{docId} {
-      allow read, write: if true;
+      allow get: if true;
+      allow list, write: if isAdmin();
     }
-    // عام لجميع المجموعات
+
+    // القاعدة الافتراضية الصارمة: منع أي وصول غير معرف
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }`;

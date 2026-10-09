@@ -105,7 +105,7 @@ export function subscribeToStoreLogo(onLogoChange: (url: string) => void): () =>
       (snapshot) => {
         if (snapshot.exists()) {
           const data = snapshot.data();
-          if (data && data.logoUrl) {
+          if (data && data.logoUrl && data.logoUrl !== '/logo.svg') {
             currentLogo = data.logoUrl;
             if (typeof window !== 'undefined') {
               try {
